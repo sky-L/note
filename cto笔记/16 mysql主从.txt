@@ -1,0 +1,51 @@
+找到my.conf文件 默认在  /etc  或  /etc/mysql/
+
+
+
+[mysqld]  下的选项为服务器配置
+
+datadir   表示当前数据库文件保存的位置
+
+
+在做主从同步前必须保证 mysql版本兼容   （版本相同或从库版本大于主库）
+保证同步前数据库文件必须一致 
+
+
+打包备份数据库的命令   tar  -zcvf  
+
+
+scp  传送备份文件
+
+配置文件中server-id  选项标示 当前数据库在集群中的id     范围  1-2321
+主库从库都必须设置id  且id不同
+
+
+进入主库  mysql交互命令行   create user 'slave_1'@'%' IDENTIFIED BY 'abcd' ;  
+
+为从库能连接主库创建用户并授权
+从库连接主库的必要条件，TCP连接与端口要畅通 如果有防火墙需要打开3306端口
+用户除了可以从从库服务器远程连接到主库外，从库连接主库使用的用户必须有权限能访问需要备份（同步）的数据库
+
+
+主库中  使用  grant replication slave  on *.* to 'slave_1'@'%';  //开启同步权限
+
+
+通过  SHOW MASTER STATUS; 显示当前主库的binlog文件与文件位置，我们需要将这个位置记录下来
+
+
+连接到从库   开启主从同步  CHANGE MASTER TO MASTER_HOST = '192.168.14.129' ,MASTER_USER='slave_1' ,MASTER_PASSWORD = 'abcd' ,MASTER_LOG_FILE ='binlog文件名', MASTER_LOG_POS=位置 
+
+
+不想同步系统库可以选择忽略系统库 
+
+在my.cof 添加 binlog_igore_db  mysql  不同步mysql库
+
+
+START SLAVE
+
+STOP  SLAVE
+
+SHOW SLAVE STATUS
+
+
+

@@ -1,0 +1,40 @@
+1.选择  LTS 版本
+2.远程连接配通
+3.apt-get update   更新
+使用apt-get时必需使用管理员权限
+
+
+注意 ： 服务器默认不要使用root进行远程登录
+切换root用户的方法
+sudo su
+（无需再次输入 sudo）使用 apt-get install vim  安装vim 编辑器
+
+开启远程管理  需要安装  openssh-server (apt-get install openssh-server)
+安装完以后 ，/etc/init.d/ssh start
+mac  通过ssh进行远程连接服务器  (ssh cyl@192.168.123.3)
+.ssh
+使用 ifconfig命令  可以查看服务器的IP地址
+
+
+linux或  mac下 生成密钥对的命令是  ssh-keygen -t rsa  默认生成路径在家目录的.ssh目录下
+
+
+
+关闭密码登录，确保服务器安全（关闭密码登录之前，一定要能够正常使用密钥登录）
+
+
+
+在用户的家目录下的.ssh目录（如果目录不存在就创建一个）authorized_keys  文件，并将生成的公钥文件的内容放到里面，就可以在本地使用密钥登录服务器
+
+
+为了保障服务器安全，我们要将密码登录关闭
+
+找到 /etc/ssh/sshd_config 修改 PasswordAuthentication yes（如果前面有# ,则需要把注释给去掉） 把yes  改成 no
+
+
+ssh 端口默认为 22  ,把端口号修改为大于一千的数值
+
+
+
+假设，我们有一个商城项目 开发团队有三个小组，每个小组需要在自己本组内测试模块代码，如果测试通过则与其它小组合并代码并在本地服务器进行内部测试，内部测试再通过，将代码上传到公网服务器进行测试，经过一致两周的测试，没有严重问题，则将公网服务器中的代码推向产品服务器。
+

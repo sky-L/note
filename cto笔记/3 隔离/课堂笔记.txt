@@ -1,0 +1,23 @@
+重点：隔离
+关键词：跳板·取名·别名·脚本
+
+ssh root@10.99.101.183  -p  22 
+
+
+从web服务器返回到跳板，exit命令
+
+ssh root@FWEB1
+
+scp -P 1678 /var/www.yulong.name/* root@FWEB1:/var/www/www.yulong.name/  (注意，文件路径必需存在，-P 为大写P 而且紧跟在scp命令后)
+
+如果把他们放在脚本里面，并且做好别名，一个命令搞定
+
+
+做别名的文件名称 
+
+家目录下创建
+.bash_profile
+
+里面写  alias  ff=''
+
+用source .bash_profile就可以生效了

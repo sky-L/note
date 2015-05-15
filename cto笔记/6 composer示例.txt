@@ -1,0 +1,32 @@
+常用的php web服务器支持
+
+composer用于帮助开发者下载框架并管理框架所需依赖
+
+curl -sS https://getcomposer.org/installer | php 安装composer  （安装前必需先安装php5.4及以上版本，必需安装curl）
+
+安装成功后当前文件夹会出现一个 composer.phar
+
+使用mv composer.phar /usr/bin/ 命令将composer添加到系统目录
+
+使用composer -v检查当前composer版本
+
+composer install 命令用于在当前项目中根据composer.json文件下载所需的组件和框架（composer.json需要在当前项目根目录下）
+
+composer create-project xxxx/xxxx  表示用 xxxx框架创建一个新项目
+
+
+apache LAMP（普通站点，对高并发没有特殊需求的站点）
+
+nginx  LNMP（并发性能好） LNAMP（支持高并发并具有较强的稳定性）
+
+php -S  (开发测试-不可用于产品环境)  
+
+使用LAMP架构
+
+在php的早期版本默认以libphp5.so模块扩展方式安装php，在php的新版本（5.5）默认未启用模块扩展，而是采用fast-cgi方式安装（php-fpm）
+
+通常默认采用的是libphp5.so扩展方式（好处是稳定，配置简单）
+
+如果手动编译安装php5.5及以上版本，需要指定  --with-apache
+
+ubuntu 中  apachectl start 启动apache服务

@@ -1,0 +1,29 @@
+安装composer
+
+composer依赖php5.3以上版本
+
+建议使用5.4以上
+
+安装composer之前先安装php5
+
+sudo apt-get update
+
+sudo apt-get install php5
+
+php -S xx.xx.xx.xx:8080(默认的站点根目录在家目录下)
+
+如果测试没有问题
+
+检查是否有安装CURL
+
+如果没有安装CURL 则 sudo apt-get install curl
+
+curl -sS https://getcomposer.org/installer | php 将composer安装到本地的当前目录下
+
+mv ./composer.phar /bin/composer   将composer移动到bin目录并改名
+
+只需要创建项目文件夹并在项目文件夹中编写composer.json文件即可通过composer自动下载相应组件并自动加载
+
+composer 可以用create命令帮我们直接使用某些框架创建项目
+
+它除了会帮我下载制定的组件外，还会把组件需要依赖的组件也下载下来

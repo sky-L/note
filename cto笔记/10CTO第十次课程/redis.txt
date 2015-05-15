@@ -1,0 +1,13 @@
+redis合并多个 dump.rdb
+
+下载redis-dump文档地址：https://github.com/delano/redis-dump
+
+apt-get install ruby
+
+apt-get install ruby1.9.1-dev
+
+gem install redis-dump
+
+下载过程中提示  Error installing redis-dump: ERROR: Failed to build gem native extension.
+
+添加 ruby1.9.1-dev包就可以解决这个问题了：apt-get install ruby1.9.1-dev

@@ -1,0 +1,8 @@
+作业
+补充 UserMQ类中  序列化对象(package)和反序列化对象(unpackage)的方法
+
+listen.php第十行处增加将对象插入数据库的方法
+
+
+
+打包下载的地址  http://www.testweb.com/phpmq.tar.gz  注意 需要自己改hosts文件将域名解析到115.29.240.194

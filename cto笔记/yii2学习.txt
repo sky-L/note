@@ -1,0 +1,1244 @@
+##Yii2 Lesson 1 安装框架并创建我们的第一个应用程序
+
+1. 在官网下载basic模板, 通过压缩包安装, 下载地址 http://www.yiiframework.com/download/
+2. 然后解压, 将basic放到服务器根目录
+3. 访问localhost/basic/web  发现没权限, 将basic/runtime 和  basic/web/assets basic/models basic/controllers basic/views (为了gii生成代码) 目录的读写权限给everyone
+4. 然后访问发现非法配置, 修改config/web.php 将cookieValidationKey的value随便加一些字符串就行
+
+##Yii2 Lesson 2 路由
+
+1. 查看controllers, model, views/layouts views/site views/site/index.php
+2. 修改首页视图内容, views/site/index.php  将  <h1>Congratulations!</h1> 修改为<h1>Yii is Easy!</h1>  再刷新首页看一下
+3. http://localhost/basic/web/index.php?r=site%2Fabout  site是控制器, about是方法
+4. 找到controllers/SiteController.php 发现里面有index, about, login方法等
+5. 想在SiteController添加一个方法 
+
+```
+public function actionHello() {
+	return $this->render('hello');
+}
+```
+
+6. 在views/site/下面添加一个hello.php
+```
+<h1>Welcome to Yii2</h1>
+```
+
+7. 访问http://localhost/basic/web/index.php?r=site/hello 验证一下是否输出了我们想要的视图内容
+8. 如果想要从控制器中传值到视图中, 修改控制器
+SiteController.php
+```
+ public function actionHello() {
+        $name = 'MaxwellDu';
+        return $this->render('hello', ['name' => $name]);
+ }
+```
+
+hello.php
+```
+<h1>Welcome to Yii2</h1>
+<?= $name; ?>
+```
+
+##Yii2 Lesson 3 Yii2中的表单
+1. 创建一个model\UserForm.php
+```
+<?php
+
+namespace app\models;
+
+use yii\base\Model;
+
+class UserForm extends Model
+{
+    public $name;
+    public $email;
+
+    public function rules() //验证规则
+    {
+        return [
+            [['name', 'email'], 'required'], //这两个必填
+            ['email', 'email'],  //这个要符合邮箱格式
+        ];
+    }
+}
+```
+
+2. 添加一个方法
+SiteController.php
+```
+ public function actionUser()
+    {
+        $model = new UserForm; // 需要在头部导入UserForm  use app\models\UserForm;
+
+        if($model->load(Yii::$app->request->post()) && $model->validate())
+        {
+            //todo
+        } else {
+            return $this->render('userForm', ['model' => $model]);
+        }
+    }
+```
+
+3.写一个视图文件
+views\site\userForm.php
+```
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+?>
+
+<?php $form = ActiveForm::begin(); ?>
+
+<?= $form->field($model, 'name'); ?>
+<?= $form->field($model, 'email'); ?>
+
+<?= Html::submitButton('submit', ['class' => 'btn btn-success']); ?>
+```
+
+4. 验证后传递一个session, 提示正确, 修改控制器
+```
+
+    public function actionUser()
+    {
+        $model = new UserForm;
+
+        if($model->load(Yii::$app->request->post()) && $model->validate())
+        {
+            //todo
+            Yii::$app->session->setFlash('success', 'You have entered the data correctly');
+        }
+        return $this->render('userForm', ['model' => $model]);
+
+    }
+```
+
+5. 视图文件中输出一下返回的session内容
+```
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+?>
+
+<?php
+    if(Yii::$app->session->getFlash('success')) {
+        echo Yii::$app->session->getFlash('success');
+    }
+?>
+
+<?php $form = ActiveForm::begin(); ?>
+
+<?= $form->field($model, 'name'); ?>
+<?= $form->field($model, 'email'); ?>
+
+<?= Html::submitButton('submit', ['class' => 'btn btn-success']); ?>
+```
+
+##Yii2 Lesson 4 连接数据库和ActiveRecords
+
+1. 先将上节课的输出美化一下, 将视图文件的输出换成以下代码
+```
+<?php
+    if(Yii::$app->session->getFlash('success')) {
+        echo "<div class='alert alert-success'>".Yii::$app->session->getFlash('success')."</div>";
+    }
+?>
+```
+
+2.配置数据库, config/db.php
+```
+<?php
+
+return [
+    'class' => 'yii\db\Connection',
+    'dsn' => 'mysql:host=127.0.0.1;dbname=yii2easy',
+    'username' => 'root',
+    'password' => 'root',
+    'charset' => 'utf8',
+];
+```
+
+3. 连接mysql, 创建一个数据库
+mysql -uroot -proot
+create database yii2easy;
+use yii2easy;
+
+create table users (user_id int not null primary key auto_increment, username varchar(100), password varchar(32));
+insert into users(username, password) values ('abc', 'jkljkl');
+insert into users(username, password) values ('def', 'fdsfds');
+
+create table posts (post_id int not null auto_increment primary key, post_title varchar(100), post_description text, author_id int, index(author_id)); 
+
+添加一个外键约束, posts的author_id关联用户表的user_id
+alter table `posts` add foreign key (`author_id`) references `users` (`user_id`) on delete restrict on update restrict;
+
+
+4. 创建ActiveRecord文件, models\Users.php
+```
+<?php
+
+namespace app\models;
+
+use yii\db\ActiveRecord;
+
+class Users extends ActiveRecord {
+
+
+}
+```
+
+5. 创建一个新的控制器
+controllers\UsersController.php
+```
+<?php
+namespace app\controllers;
+
+use yii\web\Controller;
+use app\models\Users;
+
+class UsersController extends Controller {
+
+    public function actionIndex()
+    {
+        $users = Users::find()->all();
+
+        $this->render('index', ['users' => $users]);
+    }
+}
+```
+
+5. 创建视图文件 views/user/index.php
+```
+<?php
+
+foreach($users as $user) {
+    echo $user->username."<br>";
+}
+
+?>
+```
+
+
+##Yii2 Lesson 5 Gii模块的CRUD操作
+
+1. 配置, basic模板默认已经配置好了, 在web.php的最下面
+```
+if (YII_ENV_DEV) {
+    // configuration adjustments for 'dev' environment
+    $config['bootstrap'][] = 'debug';
+    $config['modules']['debug'] = 'yii\debug\Module';
+
+    $config['bootstrap'][] = 'gii';
+    $config['modules']['gii'] = 'yii\gii\Module';
+}
+```
+
+2. 访问http://localhost/basic/web/index.php?r=gii
+
+3. 生成model, 在table name里面输入 posts, 然后点击预览, 生成
+
+4. 生成crud, 
+在model class中输入 app\models\Posts  
+Search model class 输入 app\models\PostsSearch   
+controller class 中输入 app\controllers\PostsController
+预览, 生成
+
+5. 路由去查看 http://localhost/basic/web/index.php?r=posts/index   尝试执行增删改查
+
+
+##Yii2 Lesson 6 访问控制
+
+1. 找到 controllers/PostController.php 中的这这段代码
+```
+
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
+                ],
+            ],
+        ];
+    }
+```
+
+2. 导入 访问控制类
+use yii\filters\AccessControl;
+
+3. 将上面的代码添加内容, 现在如下
+```
+ public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['create', 'update'],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@']
+                    ],
+                ]
+            ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
+                ],
+            ],
+        ];
+    }
+```
+
+4. http://localhost/basic/web/index.php?r=posts%2Findex  访问这个可以正常, 点击创建, 就会跳到登录页面
+输入用户名密码, admin admin登录即可发布
+
+5. 查看某条记录  http://localhost/basic/web/index.php?r=posts%2Fview&id=1
+访问到的是postsController 控制器中的actionView方法, 后面的id会传到方法的参数里面, 用来查找model
+
+6. 比如说查看一条不存在的记录  http://localhost/basic/web/index.php?r=posts%2Fview&id=100
+
+7. 查看创建的地址, 控制器, 模型, 视图文件, http://localhost/basic/web/index.php?r=posts%2Fcreate
+
+
+##Yii Lesson 7 安装高级模板
+
+1. 在官网下载压缩包, 高级模板的压缩包
+
+2. 切换到根目录 cd /Library/WebServer/Documents/advanced
+
+3. 执行初始化 php init
+选0
+yes
+
+看输出, 做了些什么事情
+
+4. 配置数据库, common\config\main-local.php
+'db' => [
+            'class' => 'yii\db\Connection',
+            'dsn' => 'mysql:host=127.0.0.1;dbname=advanced_yii2',
+            'username' => 'root',
+            'password' => 'root',
+            'charset' => 'utf8',
+        ],
+
+5. 创建数据库
+create database advanced_yii2;
+
+6. 执行数据库迁移
+./yii migrate
+
+7. 现在访问首页可以正常了  http://localhost/advanced/backend/web/index.php?r=site%2Flogin
+
+8. 注册第一个用户 maxwelldu maxwell@du.com maxwelldu
+然后自动登录了
+
+
+##Yii Lesson 8 高级模板 定制化注册表单
+
+
+http://localhost/advanced/frontend/web/index.php?r=site%2Fsignup
+1. 找到 site控制器, signup方法, SignupForm表单,  views/site/signup.php 视图  模型里面会用到 common\models\User.php
+
+2. 修改表结构, 添加一个first_name 和 last_name
+ alter table `user` add `first_name` varchar(100) not null after `id`;
+alter table `user` add `last_name` varchar(100) not null after `first_name`;
+
+3.我们需要修改 frontend/models/SignupForm.php
+添加两个属性
+    public $first_name;
+    public $last_name;
+
+添加两个规则
+['first_name', 'required'],
+['last_name', 'required'],
+
+4. 在views/site/signup.php中的表单中添加两个
+            <?= $form->field($model, 'first_name') ?>
+            <?= $form->field($model, 'last_name') ?>
+	
+可以打开注册页面看一下
+
+5. 然后我们要在注册的时候将内容赋值
+在frontend/models/SignupForm.php中添加
+$user->first_name = $this->first_name;
+$user->last_name = $this->last_name;
+
+6. 打开注册页面, 填写内容就可以注册了
+first_name  和 last_name 都会被保存起来
+
+7. 自定义消息
+['first_name', 'required', 'message' => 'have to fill this field.'],
+
+
+##Yii Lesson 9 高级模板 CRUD 生成器, 通过Gii工具
+
+
+1. 建三张表, 并设置好外键约束
+--
+-- 表的结构 `branches`
+--
+
+CREATE TABLE IF NOT EXISTS `branches` (
+  `branch_id` int(11) NOT NULL AUTO_INCREMENT,
+  `companies_company_id` int(11) NOT NULL,
+  `branch_name` varchar(100) NOT NULL,
+  `branch_address` varchar(255) NOT NULL,
+  `branch_created_date` datetime NOT NULL,
+  `branch_status` enum('active','inactive') NOT NULL,
+  PRIMARY KEY (`branch_id`),
+  KEY `companies_company_id` (`companies_company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `companies`
+--
+
+CREATE TABLE IF NOT EXISTS `companies` (
+  `company_id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_name` varchar(100) NOT NULL,
+  `company_email` varchar(100) NOT NULL,
+  `company_address` varchar(255) NOT NULL,
+  `company_created_date` datetime NOT NULL,
+  `company_status` enum('active','inactive') NOT NULL,
+  PRIMARY KEY (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `departments`
+--
+
+CREATE TABLE IF NOT EXISTS `departments` (
+  `department_id` int(11) NOT NULL AUTO_INCREMENT,
+  `branches_branch_id` int(11) NOT NULL,
+  `department_name` varchar(100) NOT NULL,
+  `companies_company_id` int(11) NOT NULL,
+  `department_created_date` datetime NOT NULL,
+  `department_status` enum('active','inactive') NOT NULL,
+  PRIMARY KEY (`department_id`),
+  KEY `branches_branch_id` (`branches_branch_id`),
+  KEY `companies_company_id` (`companies_company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+--
+-- 限制导出的表
+--
+
+--
+-- 限制表 `branches`
+--
+ALTER TABLE `branches`
+  ADD CONSTRAINT `branches_ibfk_1` FOREIGN KEY (`companies_company_id`) REFERENCES `companies` (`company_id`);
+
+--
+-- 限制表 `departments`
+--
+ALTER TABLE `departments`
+  ADD CONSTRAINT `departments_ibfk_2` FOREIGN KEY (`companies_company_id`) REFERENCES `companies` (`company_id`),
+  ADD CONSTRAINT `departments_ibfk_1` FOREIGN KEY (`branches_branch_id`) REFERENCES `branches` (`branch_id`);
+
+
+2. http://localhost/advanced/backend/web/index.php?r=gii  登录maxwelldu maxwelldu
+
+3. 创建模型
+table name		companies   
+namespace		backend\models
+
+然后是 branches
+然后是 departments
+
+4. 创建CRUD
+	backend\models\Companies
+	backend\models\CompaniesSearch
+	backend\controllers\CompaniesController
+
+	然后分别是branches 和 departments
+
+5. 打开公司的首页
+http://localhost/advanced/backend/web/index.php?r=companies%2Findex
+
+点击创建公司
+http://localhost/advanced/backend/web/index.php?r=companies%2Fcreate
+
+在最后一个公司状态里面会看到一个Active和Inactive选项, 原因是因为我们数据库里面定义的是枚举
+
+6. 发现创建时间是需要手动填写的, 找到backend/views/companies/_form.php
+将这个字段控制给删除
+
+7. 修改控制器, 创建公司的那个action
+```
+public function actionCreate()
+    {
+        $model = new Companies();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->company_id]);
+        } else {
+            return $this->render('create', [
+                'model' => $model,
+            ]);
+        }
+    }
+```
+
+修改为以下代码
+
+```
+public function actionCreate()
+    {
+        $model = new Companies();
+
+        if ($model->load(Yii::$app->request->post())) {
+            $model->company_created_date = date('Y-m-d h:m:s');
+            $model->save();
+            return $this->redirect(['view', 'id' => $model->company_id]);
+        } else {
+            return $this->render('create', [
+                'model' => $model,
+            ]);
+        }
+    }
+```
+
+8. 为了让状态字段显示的更友好, 打开backend/views/companies/_form.php中的
+    <?= $form->field($model, 'company_status')->dropDownList([ 'active' => 'Active', 'inactive' => 'Inactive', ], ['prompt' => '']) ?>
+	最后的 prompt填上Status
+
+9. 为了让查询的地方不显示id, 打开 backend/views/companies/index.php   中将gridview中的company_id 给注释起来即可
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+
+//            'company_id',
+            'company_name',
+            'company_email:email',
+            'company_address',
+            'company_created_date',
+            // 'company_status',
+
+            ['class' => 'yii\grid\ActionColumn'],
+        ],
+    ]); ?>
+
+10. 再看branches
+http://localhost/advanced/backend/web/index.php?r=branches%2Findex
+
+company id 先填我们创建的记录 1
+
+11. 将branches_created_at 删除, 将状态添加一个状态提示, index里面将id隐藏, 将创建分支的方法像上面一样修改一下
+
+12. 创建完一个branch以后看首页, 
+
+http://localhost/advanced/backend/web/index.php?r=branches%2Findex
+
+我们看到这个分支上面显示的公司的是id, 而不是公司的名称, 我们打开backend/models/Branches.php看到有个方法是 getCompaniesCompany() 是获取公司的一条记录
+
+所以我们可以在backend/views/branch/index.php中的 gridview的字段companies_company_id 修改为 companiesCompany.company_name
+
+再回去刷新, 发现显示的是公司的名称了
+
+13. 最后再将部门相关的内容修改一下
+
+http://localhost/advanced/backend/web/index.php?r=departments%2Findex
+
+修改控制器的添加方法
+在_form.php中将创建时间删除, 将状态添加一个提示
+后面将branch_id 修改为dropdownlist
+
+添加一条记录
+
+index.php中将department_id删除 
+
+修改为后
+```
+
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+
+            'companiesCompany.company_name',
+            'branchesBranch.branch_name',
+            'department_name',
+
+            'department_created_date',
+            // 'department_status',
+
+            ['class' => 'yii\grid\ActionColumn'],
+        ],
+    ]); ?>
+```
+
+##Yii2 Lesson 10 下拉列表, 内容来自于数据库
+
+在backend/views/branches/_form.php中
+使用两个类
+
+use yii\helpers\ArrayHelper;
+use \backend\models\Companies;
+
+将
+<?= $form->field($model, 'companies_company_id')->textInput() ?>
+替换成以下
+
+    <?= $form->field($model, 'companies_company_id')->dropDownList(
+        ArrayHelper::map(Companies::find()->all(), 'company_id', 'company_name'),
+        ['prompt' => 'select company']
+    ) ?>
+
+	
+将显示的标签内容换一下, 换成公司名
+打开backend/models/branches.php
+在attributeLabels中字段对应的值修改为company name
+
+后面的departments相关的是一样的修改, 很简单, 自己操作一下
+
+
+##Yii2 Lesson 11 搜索关联表从GridView里面
+
+修改分支的index.php
+将
+            'companiesCompany.company_name',
+替换成
+            [
+              'attribute' => 'companies_company_id',
+                'value' => 'companiesCompany.company_name',
+            ],
+
+访问
+http://localhost/advanced/backend/web/index.php?r=branches%2Findex
+
+发现出现了搜索框, 但是我们输入abc, 发现提示说公司名需要为整数, 原因是我们数据库存储的是整数
+
+我们需要做的第一件事情是将 BranchesSearch模型中的rules中的第一个整数限制给去掉, companies_company_id
+
+将 companies_company_id 添加到第二行的规则当中, 添加为safe
+
+
+由于搜索会走到models/branchesSearch模型
+找到里面的search方法, 将
+public function search($params)
+    {
+        $query = Branches::find();
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        $query->andFilterWhere([
+            'branch_id' => $this->branch_id,
+            'companies_company_id' => $this->companies_company_id,
+            'branch_created_date' => $this->branch_created_date,
+        ]);
+
+        $query->andFilterWhere(['like', 'branch_name', $this->branch_name])
+            ->andFilterWhere(['like', 'branch_address', $this->branch_address])
+            ->andFilterWhere(['like', 'branch_status', $this->branch_status]);
+
+        return $dataProvider;
+    }
+替换成
+
+
+    public function search($params)
+    {
+        $query = Branches::find();
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        $query->joinWith('companiesCompany');
+
+        $query->andFilterWhere([
+            'branch_id' => $this->branch_id,
+            'branch_created_date' => $this->branch_created_date,
+        ]);
+
+        $query->andFilterWhere(['like', 'branch_name', $this->branch_name])
+            ->andFilterWhere(['like', 'branch_address', $this->branch_address])
+            ->andFilterWhere(['like', 'branch_status', $this->branch_status])
+            ->andFilterWhere(['like', 'companies.company_name', $this->companies_company_id]);
+        return $dataProvider;
+    }
+
+##Yii Lesson 12 创建模块
+
+提前在backend/下面创建一个 modules目录  
+mkdir modules
+chmod 777 modules
+
+
+打开
+http://localhost/advanced/backend/web/index.php?r=gii
+
+点击Module的创建
+
+Module Class
+backend\modules\settings\Settings
+
+Module ID
+settings
+
+预览, 生成
+
+拷贝一下模块
+```
+ 'settings' => [
+            'class' => 'backend\modules\settings\Settings',
+        ],
+```
+
+打开backend/config/main.php
+看到里面有一个modules的配置, 里面为空
+
+访问settings模块
+http://localhost/advanced/backend/web/index.php?r=settings
+
+
+我们如果要在settings模块里面生成model
+打开gii, 生成model
+companies
+Companies
+backend\modules\settings\models
+
+生成其他的model是一样的
+
+如果要生成CRUD
+backend\modules\settings\models\Companies
+backend\modules\settings\models\CompaniesSearch
+backend\modules\settings\controllers\CompaniesController
+@backend/modules/settings/views/companies
+
+生成之后想要访问
+http://localhost/advanced/backend/web/index.php?r=settings/companies
+
+
+##Yii Lesson 13 Bootstrap 样式的 Datepicker [未完成]
+
+https://github.com/maxwelldu/yii2-date-picker-widget
+
+在网站根目录下面执行: 
+
+composer require 2amigos/yii2-date-picker-widget:~1.0
+
+给公司表中添加一个字段
+ALTER TABLE `companies` ADD `company_start_date` DATE NOT NULL AFTER `company_address`;
+
+
+
+
+
+#Yii Lesson 14 自动建议下拉列表搜索[未完成]
+
+打开backend/views/branches/_form.php
+
+https://github.com/maxwelldu/yii2-widget-select2
+
+#Yii2 Lesson 15 时间选择器在gridview的过滤字段中 [未完成]
+
+
+##Yii2 Lesson 16 Ajax搜索在GridView中
+
+在backend/views/branches/index.php中
+
+use yii\widgets\Pjax;
+
+然后在gridview的前后加上 begin 和 end
+```
+<?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            [
+              'attribute' => 'companies_company_id',
+                'value' => 'companiesCompany.company_name',
+            ],
+
+            'branch_name',
+            'branch_address',
+            'branch_created_date',
+            // 'branch_status',
+
+            ['class' => 'yii\grid\ActionColumn'],
+        ],
+    ]); ?>
+```
+
+修改后如下
+```
+    <?php Pjax::begin(); ?>
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            [
+              'attribute' => 'companies_company_id',
+                'value' => 'companiesCompany.company_name',
+            ],
+
+            'branch_name',
+            'branch_address',
+            'branch_created_date',
+            // 'branch_status',
+
+            ['class' => 'yii\grid\ActionColumn'],
+        ],
+    ]); ?>
+    <?php Pjax::end(); ?>
+```
+
+##Yii2 Lesson 17 上传文件到服务器上 [现在不感兴趣]
+
+
+##Yii2 Lesson 18 RBAC 第一部分
+
+建表语句:
+
+drop table if exists `auth_assignment`;
+drop table if exists `auth_item_child`;
+drop table if exists `auth_item`;
+drop table if exists `auth_rule`;
+
+create table `auth_rule`
+(
+    `name` varchar(64) not null,
+`data` text,
+`created_at` integer,
+`updated_at` integer,
+primary key (`name`)
+) engine InnoDB;
+
+create table `auth_item`
+(
+    `name` varchar(64) not null,
+`type` integer not null,
+`description` text,
+`rule_name` varchar(64),
+`data` text,
+`created_at` integer,
+`updated_at` integer,
+primary key (`name`),
+foreign key (`rule_name`) references `auth_rule` (`name`) on delete set null on update cascade,
+key `type` (`type`)
+) engine InnoDB;
+
+create table `auth_item_child`
+(
+`parent` varchar(64) not null,
+`child` varchar(64) not null,
+primary key (`parent`, `child`),
+foreign key (`parent`) references `auth_item` (`name`) on delete cascade on update cascade,
+foreign key (`child`) references `auth_item` (`name`) on delete cascade on update cascade
+) engine InnoDB;
+
+create table `auth_assignment`
+(
+    `item_name` varchar(64) not null,
+`user_id` integer not null,
+`created_at` integer,
+primary key (`item_name`, `user_id`),
+foreign key (`item_name`) references `auth_item` (`name`) on delete cascade on update cascade
+) engine InnoDB;
+
+
+在backend/config/main.php 中的components中添加一项
+   'authManager' => [
+                'class' => 'yii\rbac\DbManager',
+                'defaultRoles' => ['guest'],
+            ],
+
+
+打开backend/controllers/BranchesController.php
+引入 
+use yii\web\ForbiddenHttpException;
+
+将创建的方法加上一个判断
+  public function actionCreate()
+    {
+        if( Yii::$app->user->can( 'create-branch' ) )
+        {
+            $model = new Branches();
+
+            if ($model->load(Yii::$app->request->post())) {
+                $model->branch_created_date = date('Y-m-d h:i:s');
+                $model->save();
+                return $this->redirect(['view', 'id' => $model->branch_id]);
+            } else {
+                return $this->render('create', [
+                    'model' => $model,
+                ]);
+            }
+        } else
+        {
+            throw new ForbiddenHttpException;
+        }
+
+    }
+
+
+
+
+
+##Yii Lesson 20 依赖于下拉列表
+在添加部门的时候, 将公司id做成下拉列表, 
+打开_form.php修改成如下即可
+ <?= $form->field($model, 'companies_company_id')->dropDownList(
+        ArrayHelper::map(Companies::find()->all(), 'company_id', 'company_name'),
+        ['prompt' => 'select company']
+    ) ?>
+
+下面的分支, 我们需要基于上面的公司, 显示当前公司的分支, 这个如何做
+将这个字段改写成这样
+
+ <?= $form->field($model, 'companies_company_id')->dropDownList(
+        ArrayHelper::map(Companies::find()->all(), 'company_id', 'company_name'),
+        [
+            'prompt' => 'select company',
+            'onChange' => '
+                $.post("index.php?r=branches/lists&id='.'"+$(this).val(), function( data ) {
+                    $( "select#departments-branches_branch_id" ).html( data );
+                });'
+        ]
+    ) ?>
+
+打开浏览器, 测试一下改变的时候是否会请求
+
+在BranchController里面添加一个方法
+ public function actionLists($id)
+    {
+        $countBranches = Branches::find()
+            ->where(['companies_company_id' => $id])
+            ->count();
+
+        $branches = Branches::find()
+            ->where(['companies_company_id' => $id])
+            ->all();
+
+        if($countBranches>0) {
+            foreach($branches as $branch) {
+                echo "<option value='".$branch->branch_id."'>".$branch->branch_name."</option>";
+            }
+        } else {
+            echo "<option>-</option>";
+        }
+    }
+
+
+关于branched也修改为dropdownlist
+ <?= $form->field($model, 'branches_branch_id')->dropDownList(
+        ArrayHelper::map(Branches::find()->all(), 'branch_id', 'branch_name'),
+        ['prompt' => 'select branch']
+    ) ?>
+
+
+
+##Yii2 Lesson 21  带附件发送邮件 [加载不了视频]
+
+
+##Yii2 Lesson 22 在GridView中给行添加类样式
+
+在/backend/views/branches/index.php文件中
+在gridview 中的filterModel下面添加以下代码
+
+'rowOptions' => function($model){
+              if($model->branch_status == 'inactive')
+              {
+                  return ['class' => 'danger'];
+              } else {
+                  return ['class' => 'success'];
+              }
+        },
+
+
+##Yii2 Lesson 23 为forms弹出一个模式窗口
+
+使用bootstrap
+
+在backend/views/branches/index.php中
+引入
+use yii\bootstrap\Modal;
+use yii\helpers\Url;
+
+将创建分支的链接改为以下代码
+
+<p>
+        <?= Html::Button('Create Branches', ['value' => Url::to('index.php?r=branches/create'), 'class' => 'btn btn-success', 'id' => 'modalButton']) ?>
+    </p>
+
+    <?php
+        Modal::begin([
+            'header' => '<h4>Branches</h4>',
+            'id' => 'modal',
+            'size' => 'modal-lg',
+        ]);
+    echo "<div id='modalContent'></div>";
+
+    Modal::end();
+    ?>
+
+
+改完后发现点击之后还是没有效果, 原因是因为没有加载js
+
+打开backend/assets/AppAsset.php
+
+在js里面导入一个
+
+    public $js = [
+        'js/main.js',
+    ];
+
+在web目录里面新建一个js目录, 里面创建一个main.js文件
+内容写上
+$(function(){
+    alert("fdsaf");
+});
+
+打开页面看是否能够弹出
+
+然后将内容修改为如下
+
+$(function(){
+    // get the click of the create form
+    $('#modalButton').click(function(){
+       $('#modal').modal('show')
+           .find('#modalContent')
+           .load($(this).attr('value'));
+    });
+});
+
+
+刷新页面发现可以打开了, 但是有头部和底部
+
+我们打开backend/controllers/branchesController.php
+找到create方法
+render方法换成renderAjax
+
+                return $this->renderAjax('create', [
+                    'model' => $model,
+                ]);
+
+
+##Yii2 Lesson 24 用Ajax从表格中获得数据
+
+先创建一张位置表
+CREATE TABLE `locations` (
+ `location_id` int(11) NOT NULL AUTO_INCREMENT,
+ `zip_code` varchar(20) NOT NULL,
+ `city` varchar(100) NOT NULL,
+ `province` varchar(100) NOT NULL,
+ PRIMARY KEY (`location_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+
+再创建一张customers表
+CREATE TABLE `customers` (
+ `customer_id` int(11) NOT NULL AUTO_INCREMENT,
+ `customer_name` varchar(100) NOT NULL,
+ `zip_code` varchar(20) NOT NULL,
+ `city` varchar(100) NOT NULL,
+ `province` varchar(100) NOT NULL,
+ PRIMARY KEY (`customer_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+
+通过gii生成两个model
+
+再生成crud
+
+backend\models\Customers
+backend\models\CustomersSearch
+backend\controllers\CustomersController
+
+
+backend\models\Locations
+backend\models\LocationsSearch
+backend\controllers\LocationsController
+
+http://localhost/advanced/backend/web/index.php?r=customers%2Fcreate
+
+需要做的事情是在添加客户的时候, 选择一个zip code, 自动从locations表中将省市给填充起来
+
+http://localhost/advanced/backend/web/index.php?r=locations%2Fcreate
+先填充一些地址信息
+1111
+Colombo
+Westerm
+
+2222
+Galle
+Southern
+
+再回到
+http://localhost/advanced/backend/web/index.php?r=customers%2Fcreate
+
+将zip_code改成dropdownlist
+/backend/views/customers/_form.php
+将
+    <?= $form->field($model, 'zip_code')->textInput(['maxlength' => 20]) ?>
+
+替换成
+
+    <?= $form->field($model, 'zip_code')->dropDownList(
+        ArrayHelper::map(Locations::find()->all(), 'location_id', 'zip_code'),
+        [
+            'prompt' => 'select location',
+            'id' => 'zipCode',
+        ]
+    ) ?>
+
+在文件末尾加上js
+<?php
+$script = <<<JS
+    // here you right all your javascript stuff
+    $('#zipCode').change(function(){
+        var zipId = $(this).val();
+        $.get('index.php?r=locations/get-city-province', {zipId : zipId }, function(data){
+            var data = $.parseJSON(data);
+            $('#customers-city').attr('value', data.city);
+            $('#customers-province').attr('value', data.province);
+        })
+    });
+JS;
+$this->registerJs($script);
+?>
+
+
+在backend/controllers/LocationsController中添加一个方法
+
+    public function actionGetCityProvince($zipId)
+    {
+        $location = Locations::findOne($zipId);
+        echo Json::encode($location);
+    }
+
+
+
+##Yii Lesson 25 使用检查框给用户赋权限
+
+创建Model
+
+auth_item
+auth_assignment
+auth_item_child
+auth_rule
+
+希望在前台注册用户的时候可以勾选权限
+
+修改frontend/models/SignupForm.php
+添加一个属性
+    public $permissions;
+
+修改控制器, 将auth_item给查询出来, 传到页面
+引用后台的model
+use backend\models\AuthItem;
+
+
+    public function actionSignup()
+    {
+        $model = new SignupForm();
+        $authItems = AuthItem::find()->all();
+        if ($model->load(Yii::$app->request->post())) {
+            if ($user = $model->signup()) {
+                if (Yii::$app->getUser()->login($user)) {
+                    return $this->goHome();
+                }
+            }
+        }
+
+        return $this->render('signup', [
+            'model' => $model,
+            'authItems' => $authItems,
+        ]);
+    }
+
+
+在前台添加一个检查框列表
+use yii\helpers\ArrayHelper;
+
+            <?php
+                $authItems = ArrayHelper::map($authItems, 'name', 'name');
+            ?>
+                <?= $form->field($model, 'permissions')->checkboxList($authItems); ?>
+
+
+在创建用户的时候添加授权
+
+frontend/models/SignupForm.php
+
+
+ public function signup()
+    {
+        if ($this->validate()) {
+            $user = new User();
+            $user->first_name = $this->first_name;
+            $user->last_name = $this->last_name;
+            $user->username = $this->username;
+            $user->email = $this->email;
+            $user->setPassword($this->password);
+            $user->generateAuthKey();
+            $user->save();
+            // let add the permissions
+            $permissionList = $_POST['SignupForm']['permissions'];
+            foreach ($permissionList as $value)
+            {
+                $newPermission = new AuthAssignment;
+                $newPermission->user_id = $user->id;
+                $newPermission->item_name = $value;
+                $newPermission->save();
+            }
+
+            return $user;
+
+        }
+
+        return null;
+    }
+
+
+
+
+##Yii2 Lesson 26 自定义规则  [前面composer安装失败, 就没有添加字段]
+
+##Yii2 Lesson 27 复杂的表单
+
+创建公司的同时创建一个分支
+
+
+##Yii2 Lesson 28
+
+##Yii2 Lesson 29
+
+##Yii2 Lesson 30
+
+
+
+

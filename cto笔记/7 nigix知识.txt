@@ -1,0 +1,26 @@
+阅读nginx文档
+
+http://nginx.org/cn/docs/
+
+Nginx如何处理一个请求
+
+虚拟主机名
+
+转换rewrite规则
+
+ngx_http_rewrite_module
+
+ngx_http_proxy_module
+
+||||||ngx_http_log_module
+
+
+预习明天知识点
+
+了解什么是测试驱动开发
+
+了解什么是单元测试
+
+课后阅读php psr规范文档
+
+从ps0-ps4
