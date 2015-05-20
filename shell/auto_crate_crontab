@@ -1,0 +1,44 @@
+#!/bin/bash
+configFile=cron_config
+#php执行文件目录
+php=/webserver/php/bin/php
+project=/opt/application/vmall_task
+
+a=`cat $configFile | awk '{if($1 && $2){
+					len=split($2, posarr, "=")
+					filename=posarr[len]?posarr[len]:posarr[len-1]
+					lastname=posarr[len-1] 
+					print "" $1 "/"lastname"_"filename"\n" 
+				}else if($1){
+					filename=posarr[len]?posarr[len]:posarr[len-1]
+					print "" $1"\n"
+				}
+			}'`
+
+dir=`pwd`
+for D in $a
+do 
+findNum=`echo $D | awk -F'/' '{print NF-1}'`
+if [ $findNum == 1 ];
+then
+	param=$D
+fi
+str='
+#!/usr/bin/env bash\n
+CRON_NAME="cron"\n
+CRON_EXEC="'$php'"\n
+CRON_FILE="'$project'/'$param'.php"\n
+#CRON_ARGV=""\n
+SLEEP_TIME=3\n
+. common/cron.sh'
+        if  [ ! -d "$D" ];
+        then
+        /bin/mkdir -p "$dir/$D"
+        fi
+	if [ ! -f  "$dir/$D/job.sh" ];
+	then
+		echo "$dir/$D/job.sh"
+		echo -e $str >> "$dir/$D/job.sh"
+	fi
+
+done
