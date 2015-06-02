@@ -1,3 +1,11 @@
+##安装
+
+```
+sudo apt-get  install  rsync  注：在debian、ubuntu 等在线安装方法；
+yum install rsync    注：Fedora、Redhat 等在线安装方法；
+```
+
+
 >服务端的基本配置
 
 ```
