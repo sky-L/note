@@ -22,4 +22,7 @@ path = /tmp/rsync
 ```
 
 客户端使用命令
-`rsync -vzrtopg --exclude-from="/codes/vmall_test/exclude.list"  --delete /codes/vmall_test/admin/ rsync@192.168.1.1::t1`
+```
+rsync -vzrtopg --exclude-from="/codes/vmall_test/exclude.list"  --delete /codes/vmall_test/admin/ rsync@192.168.1.1::t1
+
+```
