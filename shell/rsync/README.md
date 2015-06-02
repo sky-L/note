@@ -24,5 +24,6 @@ path = /tmp/rsync
 客户端使用命令
 ```
 rsync -vzrtopg --exclude-from="/codes/vmall_test/exclude.list"  --delete /codes/vmall_test/admin/ rsync@192.168.1.1::t1
-
 ```
+>说明：--exclude-from 不同步的文件  --delete 服务端强制与客户端文件保持一致    /codes/vmall_test/admin  需要同步的目录
+rsync@192.168.1.1::t1 同步服务端的t1模块
