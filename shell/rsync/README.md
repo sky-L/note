@@ -35,3 +35,6 @@ rsync -vzrtopg --exclude-from="/codes/vmall_test/exclude.list"  --delete /codes/
 ```
 >说明：--exclude-from 不同步的文件  --delete 服务端强制与客户端文件保持一致    /codes/vmall_test/admin  需要同步的目录
 rsync@192.168.1.1::t1 同步服务端的t1模块
+
+
+#生产环境可示例test_push_code.sh来结合svn等部署多服务器
