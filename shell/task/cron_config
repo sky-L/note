@@ -1,0 +1,10 @@
+action/AuctionAction
+action/AuctionOrder
+action/AuctionOrder_finish
+action/cancleCouponOrder
+action/confirmReceipt
+action/CheckFalshSaleAction
+action/FallshSaleAction
+action/NotifyAction
+action/UpdatePayAction
+action/MessagePushAction
