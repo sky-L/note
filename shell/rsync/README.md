@@ -1,3 +1,6 @@
+##多服务器同步代码
+
+
 ##安装
 
 ```
@@ -37,4 +40,4 @@ rsync -vzrtopg --exclude-from="/codes/vmall_test/exclude.list"  --delete /codes/
 rsync@192.168.1.1::t1 同步服务端的t1模块
 
 
-#生产环境可示例test_push_code.sh来结合svn等部署多服务器
+###生产环境可示例test_push_code.sh来结合svn等部署多服务器
