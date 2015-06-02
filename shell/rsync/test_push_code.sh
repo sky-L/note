@@ -10,7 +10,7 @@ logdir=`date +%Y%m%d`/`date +%H`/$Pname
 
 cd $Pname
 
-svn up --username zhaokun --password ha1or2en3
+svn up --username sky --password xxxxxx
 
 sleep 2s
 
