@@ -27,10 +27,10 @@ class app
         {
             $this->binds[$str] = $function;
         }
-		else
-		{
-			$this->instances[$str] = $function;
-		}
+	else
+	{
+		$this->instances[$str] = $function;
+	}
     }
 
     public function make ($abstract,$parame = [])
