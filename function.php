@@ -144,38 +144,39 @@ if (! function_exists('arraytoXml')) {
 }
 
 
-    public function diffStr($str1,$str2){
-        $sArr1 = str_split($str1);
-        $sArr2 = str_split($str2);
-         
-        $num1  = count($sArr1);
-        $num2  = count($sArr2);
-         
-        $aNew  = array();
-         
-        if($num1 > $num2){
-            foreach($sArr1 as $k=>$val){
-                if($num2 > $k && $val != $sArr2[$k]){
-                    $aNew[] = array('s1'=>$val,'s2'=>$sArr2[$k]);
-                }elseif($num2 <= $k){
-                    $aNew[] = array("s1"=>$val);
-                }
-            }
-        }elseif($num1 < $num2){
-            foreach($sArr2 as $k=>$val){
-                if($num1 > $k && $val != $sArr1[$k]){
-                    $aNew[] = array('s1'=>$sArr1[$k],'s2'=>$val);
-                }elseif($num1 <= $k){
-                    $aNew[] = array("s2"=>$val);
-                }
-            }
-        }elseif($num1 == $num2){
-            foreach($sArr1 as $k=>$val){
-                if($val != $sArr2[$k]){
-                    $aNew[] = array('s1'=>$val,'s2'=>$sArr2[$k]);
-                }
-            }
-        }
-         
-        return $aNew;
-    }
+function diffStr($str1,$str2)
+{
+      $sArr1 = str_split($str1);
+      $sArr2 = str_split($str2);
+       
+      $num1  = count($sArr1);
+      $num2  = count($sArr2);
+       
+      $aNew  = array();
+       
+      if($num1 > $num2){
+          foreach($sArr1 as $k=>$val){
+              if($num2 > $k && $val != $sArr2[$k]){
+                  $aNew[] = array('s1'=>$val,'s2'=>$sArr2[$k]);
+              }elseif($num2 <= $k){
+                  $aNew[] = array("s1"=>$val);
+              }
+          }
+      }elseif($num1 < $num2){
+          foreach($sArr2 as $k=>$val){
+              if($num1 > $k && $val != $sArr1[$k]){
+                  $aNew[] = array('s1'=>$sArr1[$k],'s2'=>$val);
+              }elseif($num1 <= $k){
+                  $aNew[] = array("s2"=>$val);
+              }
+          }
+      }elseif($num1 == $num2){
+          foreach($sArr1 as $k=>$val){
+              if($val != $sArr2[$k]){
+                  $aNew[] = array('s1'=>$val,'s2'=>$sArr2[$k]);
+              }
+          }
+      }
+       
+      return $aNew;
+}
