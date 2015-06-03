@@ -1,0 +1,50 @@
+11.2.2字符串截取-printf
+
+1-printf '输出类型输出格式' 输出内容
+	1、%ns		输出字符串
+		n代表数字指代输出几个字符
+	2、%ni		输出整数
+		n代表数字指代输出几个字符	
+	3、%m.nf	输出浮点数
+		1.m和n是数字，指代输出的整数和小数位数。
+		2.%8.2f，代表共输出8位数，其中2位是小数，6位是整数
+
+2-实例，printf
+	1、printf %s 1 2 3 4 5 6
+		123456
+	2、printf %s %s %s 1 2 3 4 5 6
+		%s%s123456
+	3、printf '%s %s %s' 1 2 3 4 5 6 
+		1 2 34 5 6
+	4、printf '%s %s %s\n' 1 2 3 4 5 6 
+		1 2 3
+		4 5 6
+	5、printf 不能识别文件名
+		1.printf '%s' student.txt
+		2.输出的是还是"student.txt"
+	6、printf 不能和管道符一块使用
+		1.cat student.txt | printf '%s'
+		2.无结果输出
+	7、printf '%s' $( cat student.txt )
+		IdNameGenderMark1XiaomingM862LileiM903Ruhuaw83
+	8、printf '%s %s %s %s\n' $( cat student.txt )
+		Id Name Gender Mark
+		1 Xiaoming M 86
+		2 Lilei M 90
+		3 Ruhua w 83
+	9、printf '%s\t %s\t %s\t %s\t\n' $( cat student.txt )
+		Id       Name    Gender  Mark
+		1        XiaomingM       86
+		2        Lilei   M       90
+		3        Ruhua   w       83
+
+3-在awk命令输出中支持print和printf命令
+	1、print
+		在每个输出之后，自动加入一个换行符(linux默认没有print命令)
+	2、printf
+		1.是标准格式输出命令
+		2.不会自动加入换行符
+		3.需要换行，要手工加入换行符
+
+
+

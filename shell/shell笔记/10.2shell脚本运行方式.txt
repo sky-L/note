@@ -1,0 +1,92 @@
+10.2shell脚本运行方式
+
+echo
+
+1-echo [选项][输出内容]	
+	1.-e	支持反斜线控制的字符转换
+		1、\a		输出警告音
+		2、\b		退格建，也就是向左删除键
+		3、\c		取消输出行末的换行符。和"-n"选项一致
+		4、\e		ESCAPE键
+		5、\f		换页符
+		6、\n		换行符
+		7、\r		回车键
+		8、\t		制表符，也就是Tab键
+		9、\v		垂直制表符
+		10、\\		输出\本身
+		11、\0nnn	按照八进制ASCII码表输出字符。
+			其中0为数字，nnn是三位八进制数
+		12、\xhh	按照十六进制ASCII码表输出字符。
+			其中hh是两位十六进制数
+
+2-echo实例
+	1.echo 'hello world!'
+		hello world!
+	2.echo \\或echo '\'
+		\
+	3.echo -e "ab\bc"
+		ac
+	4.echo -e "a\tb\tc\nd\te\tf"
+		a       b       c
+		d       e       f
+	5.echo -e "\x61\t\x62\t\x63\n\x64\t\x65\t\x66"
+		a       b       c
+		d       e       f
+	6.echo -e "\e[1;31m abcd \e[0m"
+		abcd
+		1、输出红色的abcd
+		2、30m=黑色，31m=红色，32m=绿色，33m=黄色，
+			34m=蓝色，35m=洋红，36m=青色，37m=白色
+		3、\e[1
+			#开启颜色输出
+		4、	\e[0m
+			#结束颜色输出
+
+3-第一个脚本
+	1.vim hello.sh
+		.sh是可以告诉linux以适当颜色显示所写的脚本
+	2.hello.sh写入的内容
+		#!/bin/Bash
+		#The first program
+		#Author:wangliang(E-mail:wangliang@163.com)
+		echo -e "Mr. wangliang is good man"
+		1、#!/bin/bash
+			代表当前所写的脚本为shell脚本
+		2、shell脚本为纯的命令
+			1＝如：echo -e "Mr. wangliang is good man"
+			2＝不写#!/bin/Bash，shell脚本的标识符，并不影响shell脚本执行
+			3＝shell脚本嵌入较复杂的内容，必须写#!/bin/Bash
+			4＝对于shell脚本，统一就写#!/bin/Bash，shell脚本的标识符
+	3.保存退出
+		:wq
+	4.执行脚本
+		1、赋予执行权限，直接运行
+			1＝chmod 755 hello.sh
+			2＝使用相对路径或相对路径
+				./hello.sh
+			3＝输出
+				Mr. wangliang is good man
+		2、通过bash调用执行脚本
+			1＝bash hello.sh
+			2＝输出
+				Mr. wangliang is good man
+	
+4-出现执行错误
+	1.如：/bin/Bash: bad interpreter: 没有那个文件或目录	
+	2.cat -A hello.sh
+		1、查看有没有什么特殊字符
+	3.dos2unix hello.sh
+		1、格式转换
+		2、如果没有dos2unix命令，可以进行安装后使用
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+
+

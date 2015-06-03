@@ -1,0 +1,80 @@
+11.2.3字符截取命令-awk
+
+1-awk '条件1{动作1} 条件2{动作2} ...' 文件名
+	1、条件
+		1.一般使用关系表达式作为条件
+		2.x>10，x>=10，x<=10	
+	2、动作
+		1.格式化输出
+		2.流程控制语句
+
+2-实例，awk基本用法
+	1、awk '{printf $2 $4}' student.txt 
+		NameMarkXiaoming86Lilei90Ruhua83
+	2、awk '{printf $2 "\t" $4 "\n"}' student.txt
+		Name    Mark
+		Xiaoming86
+		Lilei   90
+		Ruhua   83
+	3、df -h
+		Filesystem      Size  Used Avail Use% Mounted on
+		/dev/sda5       6.8G  2.0G  4.6G  30% /
+		tmpfs           342M     0  342M   0% /dev/shm
+		/dev/sda1       194M   28M  157M  15% /boot
+		/dev/sda2       2.0G   36M  1.8G   2% /home
+		1.df -h | awk '{print $1 "\t" $5 "\t" $6}' 
+			Filesystem      Use%    Mounted
+			/dev/sda5       30%     /
+			tmpfs   		0%      /dev/shm
+			/dev/sda1       15%     /boot
+			/dev/sda2       2%      /home
+	4、 df -h | grep sda5
+		/dev/sda5       6.8G  2.0G  4.6G  30% /
+		1.f -h | grep sda5 |awk '{print $5}'
+			30%
+		2.df -h | grep sda5 |awk '{print $5}' | cut -d "%" -f 1
+			30
+			
+3-BEGIN
+	1、 awk '{print $1 "\t" $2 }' student.txt 
+		Id      Name
+		1       Xiaoming
+		2       Lilei
+		3       Ruhua
+	2、awk 'BEGIN{print "test !!"} {print $1 "\t" $2 }' student.txt   
+		test !!
+		Id      Name
+		1       Xiaoming
+		2       Lilei
+		3       Ruhua
+	3、 awk '{FS=":"} {print $1 "\t" $3}' /etc/passwd
+		root:x:0:0:root:/root:/bin/bash
+		user1   500
+		user2   501
+		1.awk处理，先读入第一行，然后再执行处理
+		2.在指定{FS=":"}分隔符前，第一行数据以经读入了
+		3.所以第一行就来不及处理了
+		4.后边可以正常处理
+	4、awk 'BEGIN{FS=":"} {print $1 "\t" $3}' /etc/passwd
+		root    0
+		user1   500
+		user2   501
+
+4-END
+	1、awk 'BEGIN{FS=":"} END{print "end !!"} {print $1 "\t" $3}' /etc/passwd
+		root    0
+		user1   500
+		user2   501
+		end !!
+
+5-awk关系运算符
+	1、cat student.txt  | grep -v Name | awk '$4>83 {print $2}' 
+		Xiaoming
+		Lilei
+	
+	
+	
+	
+	
+	
+	

@@ -1,0 +1,105 @@
+10.4.4预定义变量
+
+read 
+
+1-预定义变量
+	1、$?	最后一次执行的命令的返回状态。
+		1.变量值为0，证明上一个命令正确执行。
+		2.变量值为非0，证明上一个命令不正确执行。
+	2、$$	当前进程的进程号(PID)	
+	3、$！	后台运行的最后一个进程的进程号(PID)	
+
+2-实例，$?
+	1、cd ~ && cd sh && ls
+	2、echo $?
+		0
+	3、sdfsdds
+		-bash: sdfsdds: command not found
+	4、echo $?
+		127
+	5、ls llkl
+		ls: 无法访问llkl: 没有那个文件或目录
+	6、echo $?
+		2
+	7、cd dsfksd
+		-bash: cd: dsfksd: 没有那个文件或目录
+	8、echo $?
+		1
+	9、命令1 && 命令2
+		命令2判断命令1是否正确执行，正是判断$?的返回状态
+
+3-实例，$$与$!
+	1、cd ~ && cd sh
+	2、vim canshu5.sh
+		#!/bin/bash
+		echo "$$"
+		find /root -name hello.sh &
+		echo "$!"
+	3、&
+		代表命令后台执行
+	4、chmod 755 canshu5.sh 
+	5、./canshu5.sh 
+		1609
+		1610
+		/root/sh/hello.sh
+	
+4-接收键盘输入
+	1、read [选项][变量名]	
+		1.-p	提示信息
+			在等待read输入时，输出提示信息
+		2.-t	秒数
+			read命令一直等待用户输入，使用此选项可以指定等待时间
+		3.-n	字符数
+			read命令只接受指定的字符数，就会执行
+		4.-s	隐藏输入的数据，适用于机密信息的输入
+		
+5-实例，read
+	1、cd ~ && cd sh
+	2、vim read.sh
+		#!/bin/bash
+		read -t 30 -p "please input you name:" name
+		echo $name
+	3、chmod 755 read.sh 
+	4、./read.sh 
+	5、please input you name:
+		1.输入"wangliang"，回车
+			wangliang
+	6、再次编写read.sh
+		vim read.sh
+	7、在echo $name下边写
+		read -s -t 30 -p "please enter your age:" age
+		echo "\n"
+		echo $age
+	8、./read.sh 
+		1.please input you name:
+			1＝输入"wangliang"，回车
+				wangliang
+		2.please enter your age:
+			1＝输入28
+			2＝输入28，为隐藏数据，输入是看不到输入28，只能看到光标在闪动
+			3＝输入28后，显示为
+			4＝打印出please enter your age:\n
+				28
+	9、再次编写read.sh
+		vim read.sh
+	10、在echo $age下边写
+		read -n 1 -t 30 -p "[M/W]:" sex
+		echo "\n"
+		echo $sex
+	11、重复之前的输入，输入姓名，年龄
+	12、提示[M/W]:
+		1.输入M
+		2.显示为[M/W]:M\n
+		3.输入结果为
+			M
+	
+		
+		
+	
+	
+	
+	
+	
+	
+	
+

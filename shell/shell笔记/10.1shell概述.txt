@@ -1,0 +1,59 @@
+10.1shell概述
+
+1-shell简介
+	1.是一个命令行解释器，它为用户提供了一个向linux内核发送请，
+	以便运行程序的界面系统级程序，用户可以用shell来启动、挂起、
+	停止甚至是编写一些程序。
+	2.还是一个功能相当强大的编程语言，易编写，易调试，灵活性较强。
+	3.是解释执行的脚本语言，在shell中可以直接调用linux系统命令。
+
+2-shell分类
+	1.Bourne Shell
+		1、从1979年起，Unix就开始使用Bourne Shell。
+		2、Bourne Shell的主文件名为sh。
+	2.C Shell
+		1、主要在BSD版本Unix系统中使用，其语法和C语言类似，而得名。
+
+3-shell分类特点	
+	1.Bourne Shell和C Shell语法彼此不兼容。
+	2.Bourne Shell家族主要包括sh、ksh、Bash、psh、zsh。
+	3.C Shell家族主要包括csh、tcsh。
+	4.Bash
+		Bash与sh兼容，现在使用的linux就是使用Bash作为用户的基本shell。
+
+4-linux支持有shell有
+	1、vim /etc/shells 
+		/bin/sh
+		/bin/bash
+		/sbin/nologin
+		/bin/dash
+		/bin/tcsh
+		/bin/csh
+	2、/bin/bash
+		linux标准shell
+	3、/sbin/nologin
+		不允许登录
+	
+5-shell基本使用
+	1.shell之间切换
+		1、sh
+			sh-4.1# 
+	2.退出
+		exit
+	3.csh
+		[root@localhost /boot]# 
+
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
+

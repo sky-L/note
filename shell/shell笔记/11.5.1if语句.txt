@@ -1,0 +1,156 @@
+11.5.1if语句
+
+1-单分支if条件语句
+	1、写法一
+		if [ 条件判断式 ];then
+			程序
+		fi
+	2、写法二
+		if [ 条件判断式 ]
+			then
+				程序
+		fi
+		
+2-实例，单分支if条件语句
+	1、if [ -e install.log ];then
+			echo yes
+		fi
+		1.输出
+			yes
+	2、也可以这样书写
+		if [ -e install.log ];then echo yes; fi
+	3、
+		if [ -e install.log ]
+			then
+				echo yes
+		fi
+
+3-实例，判断分区使用率
+	1、cd ~ && mkdir sh
+		1.vim if1.sh
+			#!/bin/bash
+			rate=$(df -h | grep "/dev/sda5" | awk '{print $5}' | cut -d "%" -f1)
+			if [ $rate -ge 20 ] ; then
+				echo '/dev/sda5 use big 20'
+			fi
+		2.chomd 755 if1.sh && ./if1.sh
+			/dev/sda5 use big 20
+
+4-双分支if条件语句
+	if [ 条件判断式 ]
+		then
+			条件成立时，执行的程序
+		else
+			条件不成立时，执行的另一个程序
+	fi
+
+5-实例，双分支if条件语句
+	1、实例一
+		if [ -f /root/ ]
+			then 
+				echo 'is a file'; 
+			else 
+				echo 'is not a file'; 
+		fi
+	2、实例二
+		if [ -f /root/ ]
+			then
+				echo 'is a file'; 
+				echo "yes";
+			else
+				echo 'is not a file';
+				echo "no";
+		fi
+
+6-实例，判断apache是否启动
+	1、yum -y install nmap
+	2、得到大概这些信息
+		PORT    STATE SERVICE
+		22/tcp  open  ssh
+		80/tcp  open  http
+		111/tcp open  rpcbind
+	3、nmap -sT 192.168.1.11 | grep "tcp" | grep "http"
+		80/tcp  open  http
+	4、nmap -sT 192.168.1.11 | grep "tcp" | grep "http" | awk '{print $2}'
+		open
+	5、cd ~ && mkdir sh && cd sh
+	6、vim if3.sh
+		#!/bin/bash
+		port=$(nmap -sT 192.168.1.11 | grep "tcp" | grep "http" | awk '{print $2}')
+		if [ "$port" == "open" ]
+				then
+						echo "$(date) httpd is ok!" >> /tmp/httpd_acc.log
+				else
+						/etc/rc.d/init.d/httpd restart &> /dev/null
+						echo "$(date) httpd reboot!" >> /tmp/http_error.log
+		fi
+	7、chmod 755 if3.sh && ./if3.sh
+	8、cd /tmp/ && ls
+		httpd_acc.log 
+	9、cat httpd_acc.log 
+		2015年 05月 06日 星期三 07:13:35 CST httpd is ok!
+	10、service httpd stop
+	11、/root/sh/if3.sh && ls
+		http_error.log
+	12、cat http_error.log
+		2015年 05月 06日 星期三 07:17:05 CST httpd reboot
+	13、netstat -tlun
+		tcp		0	0 	:::80		:::* 	LISTEN
+		#httpd以经启动了
+
+7-多分支if条件语句
+	if [ 条件判断1 ]
+		then
+			当条件判断式1成立时，执行程序1
+	elif [ 条件判断2 ]
+		then
+			当条件判断式2成立时，执行程序2
+	elif [ 条件判断3 ]
+		then
+			当条件判断式3成立时，执行程序3		
+	……省略更多条件
+	else
+		当所有条件都不成立时，最后执行此程序
+	fi
+	
+8-实例，多分支if条件语句	
+	1、cd ~ && sh && cd sh
+	2、vim if3.sh
+		#!/bin/bash
+		read -p  "Please input a filename: " file
+		if [ -z "$file" ]
+				then
+				echo "Error,please input a filename"
+				exit 1
+		elif [ ! -e "$file" ]
+				then
+				echo "$file is a file"
+				exit 2
+		elif [ -f "$file" ]
+				then
+				echo "Your input is not a file"
+		elif [ -d "$file" ]
+				then
+				echo "$file is a dir"
+		else
+				echo "$file is an other file"
+		fi
+	3、chmod 755 if4.sh && ./if4.sh
+		1.Please input a filename:
+		2.直接回车
+			Error,please input a filename
+		3.echo $?
+			1
+		4.再次执行./if4.sh
+			1＝Please input a filename:
+			2＝输出dfasfdsdf
+			3＝Your input is not a file
+			4＝echo $?
+				2
+		5.再次执行./if4.sh
+			1＝Please input a filename:
+			2＝输出/root
+			3＝/root is a dir
+			4＝echo $?
+				0
+

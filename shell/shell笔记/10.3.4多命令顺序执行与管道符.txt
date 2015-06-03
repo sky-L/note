@@ -1,0 +1,103 @@
+10.3.4多命令顺序执行与管道符
+
+dd grep ; && || |
+
+1-多命令顺序执行
+	1、;	命令1;命令2
+		多个命令顺序执行，命令之间没有任何逻辑联系
+	2、&&	命令1&&命令2
+		1.逻辑与
+		2.当命令1执行正确，则命令2才会执行
+		3.当命令1执行错误，则命令2不执行
+	3、||	命令1||命令2
+		1.逻辑或
+		2.当命令1执行正确，则命令2不执行
+		3.当命令1执行错误，则命令2才会执行
+
+2-实例，多命令顺序执行
+	1、cd /root;date;cd /wang;ls 
+		2015年 05月 15日 星期五 06:31:40 CST
+		-bash: cd: /wang: 没有那个文件或目录
+		lanaconda-ks.cfg  install.log  install.log.syslog
+	2、ls && echo yes
+		anaconda-ks.cfg  install.log  install.log.syslog
+		yes
+	3、lsssdf && echo yes
+		-bash: lsssdf: command not found
+	4、lsssdf || echo no 
+		-bash: lsssdf: command not found
+		no
+	5、ls|| echo  do not look
+		anaconda-ks.cfg  install.log  install.log.syslog
+	6、命令 && echo yes || echo no
+		1.如果命令执行正确，进行逻辑与运算，运算结果为输出yes；
+			1、那么输出yes做执行逻辑与运算的正确结果，作为一个整体，
+			2、再进行逻辑或运算，由于进行执行逻辑与运算的结果正确，
+				就不输出no了
+			3、ls && echo yes || echo no
+				anaconda-ks.cfg  install.log  install.log.syslog
+		2.如果命令执行错误，进行逻辑或运算，不会输出yes；
+			那么echo yes执行结果错误，再进行逻辑或运算，就会输出no了
+			1、lsssdf && echo yes || echo no 
+				-bash: lsssdf: command not found
+				no
+	7、命令 || echo yes && echo no
+		1.ls || echo yes && echo no
+			anaconda-ks.cfg  install.log  install.log.syslog
+			no
+		2.lsssdf || echo yes && echo no
+			-bash: lsfsdfs: command not found
+			yes
+			no		
+	8、无论逻辑与运算，还是逻辑或运算，
+		多个参数一块进行逻辑运算，只要一个结果
+	
+3-dd if=输入文件 of=输出文件 bs=字节数 count=个数
+	1、if=输入文件
+		指定源文件或源设备
+	2、of=输出文件
+		指定目标文件或目标设备
+	3、bs=字节数
+		指定一次输入/输出多少字节，即把这些字节看做一个数据志
+	4、count=个数
+		指定输入/输出多少个数据块
+	5、date;dd if=/dev/zero of=/root/testfile bs=1k count=100000
+		2015年 05月 15日 星期五 06:36:29 CST
+		记录了100000+0 的读入
+		记录了100000+0 的写出
+		102400000字节(102 MB)已复制，2.27641 秒，45.0 MB/秒
+	6、ll /root/testfile
+		即可看到刚刚输出testfile文件大小
+
+4-现实中一件事情，用逻辑或运算，或者是用逻辑与运算去理解
+	1、小明和小丽实例
+		1.小明平常是一个非常尊敬老人的人。
+		2.小丽平常是一个非常尊敬老人的人。
+		3.一天小明陪小丽在王府井逛街，看到肯德鸡门口的老奶奶摔倒了，
+		4.他们俩一块手牵着手飞奔过去，立刻把把老人扶起来了，
+			询问了老奶奶没有事情后，又手牵着手的悄悄离开了
+		5.在场的每个人无不羡慕这对情侣恩爱，更认为他们真是好人呢
+		6.$xm="小明"; $xl="小丽"; $hr="他们是好人"
+		7.进行逻辑与运算
+			小明和小丽块把老人扶起来了
+		8.逻辑与运算结果
+			路人认为小明和小丽是好好人。
+		9.小明 && 小丽 = 小明和小丽是好人
+		10.$xm && $xl =$hr
+		
+5-管道符
+	1、命令1 | 命令2
+		把命令1执行正确的结果作为命令2的操作对象
+	2、ll -a /etc/ | more
+			drwxr-xr-x. 103 root root  12288 5月  15 06:17 .
+			dr-xr-xr-x.  24 root root   4096 5月  15 06:17 ..
+			drwxr-xr-x.   3 root root   4096 4月  12 02:16 abrt
+			drwxr-xr-x.   4 root root   4096 4月  12 02:21 acpi
+			-rw-r--r--.   1 root root     16 4月  12 02:23 adjtime
+		--More--
+	3、lsdsfsd /etc/ |more
+		-bash: lsdsfsd: command not found
+	4、netstat -an | grep --color=auto 'ESTABLISHED'
+		tcp   0   52   192.168.1.11:22   192.168.1.100:49421   ESTABLISHED 
+		1.系统会让"ESTABLISHED"拥有颜色
+

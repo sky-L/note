@@ -1,0 +1,166 @@
+10.3.3输入和输出重定向
+
+> >> 2> 2>> &> &>> wc
+
+1-标准输入输出
+	设备		设备文件名		文件描述符		类型
+	键盘		/dev/stdin			0			标准输入
+	显示器		/dev/stdout			1			标准输出
+	显示器		/dev/stderr			2			标准错误输出
+
+2-输出重定向
+	1.标准输出重定向	
+		1、命令 > 文件
+			以覆盖的方式，把命令的正确输出输出到指定的文件或设备当中
+	    2、命令 >> 文件
+			以追加的方式，把命令的正确输出输出到指定的文件或设备当中
+	2.标准错误输出重定向		
+		1、错误命令 2> 文件
+			以覆盖的方式，把命令的错误输出输出到指定的文件或设备当中
+	    2、错误命令 2>> 文件
+			以追加的方式，把命令的错误输出输出到指定的文件或设备当中
+	3.正确输出和错误输出同时保存
+		1、命令 > 文件 2>&1
+			以覆盖的方式，把正确和错误输出都保存到同一个文件中
+		2、命令 >> 文件 2>&1
+			以追加的方式，把正确和错误输出都保存到同一个文件中
+		3、命令 &> 文件
+			以覆盖的方式，把正确和错误输出都保存到同一个文件中
+		4、命令 &>> 文件
+			以追加的方式，把正确和错误输出都保存到同一个文件中
+		5、命令 >> 文件1 2>> 文件2
+			把正确的输出追加到文件1中，把错误的输出追加到文件2中
+	4.输出重定向解释
+		不是把命令输出的结果到屏幕中，而把命令输出的结果保存在文件中
+	5.只有用于输出的命令才能使用输出重定向，否则其它命令使用输出重定向无意义
+
+3-输出重定向，正确输出实例
+	1.ls
+		anaconda-ks.cfg  install.log  install.log.syslog  sh
+	2.ls > abc
+	3.ls
+		abc  anaconda-ks.cfg  install.log  install.log.syslog  sh
+	4.cat abc
+		abc
+		anaconda-ks.cfg
+		install.log
+		install.log.syslog
+		sh
+	5.date
+		2015年 05月 14日 星期四 07:33:32 CST
+	6.date > abc
+	7.cat abc
+		2015年 05月 14日 星期四 07:33:32 CST
+	8.date >> abc
+	9.cat abc	
+		2015年 05月 14日 星期四 07:34:46 CST
+		2015年 05月 14日 星期四 07:36:05 CST
+	
+4-输出重定向，错误输出实例
+	1.lst
+		-bash: lst: command not found
+	2.lst 2> efg
+	3.cat efg
+		-bash: lst: command not found
+	4.lst 2>> efg
+	5.cat efg
+		-bash: lst: command not found
+		-bash: lst: command not found
+
+5-正确输出和错误输出重定向同时保存
+	1.lst &>> abc1
+	2.cat abc1
+		-bash: lst: command not found
+	3.ls &>> abc1
+	4.cat abc1	
+		-bash: lst: command not found
+		abc1
+		anaconda-ks.cfg
+		install.log
+		install.log.syslog
+	5.ls >> abc1 2>> abc2
+	6.cat abc1
+		abc1
+		abc2
+		anaconda-ks.cfg
+		install.log
+		install.log.syslog
+	7.lst >> abc1 2>> abc2
+	8.cat abc2
+		-bash: lst: command not found
+	
+6-制作类似于垃圾箱
+	1.ls &> /dev/null
+		#命令执行的正确和错误输出都放到/dev/null文件中，
+		也就看不到了正确和错误输出
+	
+7-输入重定向
+	1.wc [选项][文件名]
+		1、-c	统计字节数
+		2、-w	统计单词数
+		3、-l	统计行数
+	2.输入重定向解释
+		执行命令的参数，不再用键盘输出，而是用文件输入命令的参数
+	3.实际工作中不常用，一般给源码包打补丁时用到	
+		
+8-wc使用实例
+	1.输入wc
+	2.随便输入一些字符，如：
+		dfsd 54dsfsd 54f
+		dfsds
+		dsfdf "dfd dsf" dfsf
+	3.按ctrl+d键，退出当前终端
+	4.显示的结果为
+		3       8      44
+	5.显示结果解释
+		1、输出3行，共8个单词，共44个字符
+		2、输入统计单词，为字符之间没有空格算是一个单词
+		3、字符当中包含回车符
+	6.wc -c
+	7.随便输入一些字符，如：
+		dfsd 54dsfsd 54f
+		dfsds
+		dsfdf "dfd dsf" dfsf
+	8.44
+		#共44个字符
+	
+9-输入重定向使用
+	1.命令 < 文件
+	2.把文件作为命令的输入
+	
+10-输入重定向实例		
+	1.wc < anaconda-ks.cfg 
+	2.显示为
+		54  124 1272
+	3.wc -l < anaconda-ks.cfg
+	4.显示为
+		54 
+
+11-输入重定向实例，使用双小于号"<<"
+	1.输入wc << hello
+	2.回车显示显示大于号">"，让你继续输入，
+		1、如输入dfssd df56 df，再回车,显示大于号">"，让你继续输入
+		2、输入大概结果为
+			> dfssd df56 df
+			> 8898fds
+			> dsf df
+		3、再次回车输入hello
+			> hello
+		4、整个数的过程字符为
+			wc << hello
+			> dfssd df56 df
+			> 8898fds
+			> dsf df
+			> hello
+		5、回车后显示显示的结果为
+			3  6 29
+
+
+
+
+
+
+
+		
+	
+	

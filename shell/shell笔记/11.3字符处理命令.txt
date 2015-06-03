@@ -1,0 +1,17 @@
+11.3×Ö·û´¦ÀíÃüÁî
+
+sort wc 
+
+1-sort
+	1¡¢sort /etc/passwd
+	2¡¢sort -r /etc/passwd
+	3¡¢sort -t ":" -k 3,3 /etc/passwd
+	4¡¢sort -t ":" -k 3,3 -n /etc/passwd
+
+2-wc
+	1¡¢wc /etc/passwd
+		33   54 1533 /etc/passwd
+	2¡¢wc -l /etc/passwd
+		33 /etc/passwd
+
+

@@ -1,0 +1,94 @@
+10.3.5通配符和其他特殊符号
+
+1-通配符
+	1、?	匹配一个任意字符	
+	2、*	匹配0个或任意多个任意字符，也就是可以匹配任何内容
+	3、[]	匹配中括号中任意一个字符
+		[abc]代表一定匹配一个字符，或者是a，或者是b，或者是c
+	4、[-]	匹配中括号中任意一个字符，-代表一个范围
+		[a-z]代表匹配一个小写字母
+	5、[^]	逻辑非，表示匹配不是中括号内的一个字符
+		[^0-9]代表匹配一个不是数字的字符
+
+2-实例，通配符
+	1、*
+		1.cd ~
+		2.cp anaconda-ks.cfg  install.log  install.log.syslog /tmp
+		3.ls /tmp
+			anaconda-ks.cfg  install.log  install.log.syslog
+		4.rm -fr /tmp/*
+	2、
+		1.cd /tmp
+		2.touch abc abcd 123
+		3.ls
+			abc abcd 123
+		4.ls *abc
+			abc
+		5.ls abc*
+			abc  abcd
+		6.ls ?abc
+			ls: 无法访问?abc: 没有那个文件或目录
+		7.ls [0-9]*
+			123
+		8.ls [^0-9]*
+			abc  abcd
+3-通配符特征
+	是要完全匹配的
+
+4-通配符作用
+	用来匹配文件名的
+	
+5-其他特殊符号
+	1、''	单引号
+		在单引号内的所有特殊符号，如"$"和"`"(反引号)都没有特殊含义
+	2、""	双引号
+		1.在双引号内的特殊符号没有特殊含义
+		2.但对于"$"，"`"(反引号)，"\"(反斜杠)例外
+	3、``	反引号
+		1.反引号内的内容是系统命令
+		2.在bash中会先执行它，和$()作用一样，
+		3.推荐使用$()，因为反引号非常容易看错
+	4、$()	和反引号作用一样，用来引用系统命令
+	5、#	在shell脚本中，#开头的代表注释
+	6、$	用于调用变量的值
+		如需要用变量name的值，需要用$name的方式得到变量的值
+	7、\	转义符
+		1.跟在"\"(反斜杠)之后的特殊符号将推动特殊含义，变为普通字符
+		2.如\$将输出"$"符号，而不当做是变量引用
+	
+6-实例，特殊符号	
+	1、单引号，双引号
+		1.name=xiaoming
+		2.echo $name
+			xiaoming
+		3.echo '$name'
+			$name
+		4.echo "$name" 
+			xiaoming
+	2、反引号
+		1.abc=`date`
+		2.echo $abc
+			2015年 05月 15日 星期五 08:39:29 CST
+		3.echo `ls`
+			anaconda-ks.cfg install.log install.log.syslog
+		4.echo ls
+			ls
+		5.echo $(ls)
+			anaconda-ks.cfg install.log install.log.syslog
+	3、$()
+		1.abc=$(date)
+		2.echo $abc
+			2015年 05月 15日 星期五 08:40:31 CST
+	4、"\"转义符	
+		1.name=xiaoming
+		2.echo $name
+			xiaoming
+		3.echo \$name
+			$name
+		
+		
+		
+		
+	
+	
+

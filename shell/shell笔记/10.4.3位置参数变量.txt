@@ -1,0 +1,72 @@
+10.4.3位置参数变量
+
+1-位置参数变量
+	1、$n	n为数字，
+		1.$0代表命令本身
+		2.$1-$9代表第一到第九个参数
+		3.十以上的参数需要用大括号包含，如${10}
+	2、$*	代表命令行中所有的参数
+		$*把所有的参数看成一个整体
+	3、$@	代表命令行中所有的参数
+		$@把每个参数区分对待
+	4、$#	代表命令行中所有参数的个数
+
+2-实例，$n	
+	1、cd ~ && mkdir sh && cd sh
+	2、vim canshu1.sh
+		#!/bin/bash
+		echo $0
+		echo $1
+		echo $2
+		echo $3
+	3、./canshu1.sh 
+		1.输出./canshu1.sh和三行空行
+		2.$0代表命令本身
+		3.$1，$2，$3里边没有任何数据，所以打印三行空行
+	4、./canshu1.sh  11 22 33
+		./canshu1.sh
+		11
+		22
+		33
+
+3-实例，$n加法计算器
+	1、vim canshu2.sh
+		#!/bin/bash
+		sum=$(( $1+$2 ))
+		echo "sum is: $sum"           	
+	2、进行数值运算，必须要加双小括号
+	3、chmod 755 canshu2.sh
+	4、./canshu2.sh  10 20
+		sum is: 30
+
+4-实例，$*，$@，$#
+	1、vim canshu3.sh
+		#!/bin/bash
+		echo $*
+		echo $@
+		echo $#
+	2、chmod 755 canshu3.sh
+	3、./canshu3.sh 10 "aa" "bbsd" 44554
+		10 aa bbsd 44554
+		10 aa bbsd 44554
+		4
+
+5-实例，$*与$@区别
+	1、vim canshu4.sh
+		#!/bin/bash
+		for i in "$*"
+			do
+				echo "$i"
+			done
+		for y in "$@"
+			do
+				echo "$y"
+			done
+	2、chmod 755 canshu4.sh
+	3、./canshu4.sh 1 2 3 4
+		1 2 3 4
+		1
+		2
+		3
+		4
+

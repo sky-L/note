@@ -1,0 +1,68 @@
+11.2.1字符串截取-cut
+
+1-cut [选项]文件名
+	1、-f 	列号
+		提取第几列
+	2、-d 	分隔符
+		1.按照指定分隔符分割列
+		2.默认分割符为制表键
+
+2-创建一个测试文本
+	Id	Name		Gender	Mark
+	1	Xiaoming	M		86
+	2	Lilei		M		90
+	3	Ruhua		w		83
+	1、字段中间的空白地方，不能是空格，要是制表键，按tab键
+	2、如果空白地方是空格，cut命令不能正确提取
+
+3-实例，cut
+	1、cut -f 2 student.txt 
+		Name
+		Xiaoming
+		Lilei
+		Ruhua
+	2、cut -f 2,1 student.txt  
+		Id      Name
+		1       Xiaoming
+		2       Lilei
+		3       Ruhua
+	3、cut -d ":" -f 1,3 /etc/passwd
+		root:0
+
+4-实例，提取/etc/passwd除超级管理员外的普通用户
+	1、useradd user1 && useradd user2&& useradd user3
+	2、cat /etc/passwd | grep /bin/bash
+		root:x:0:0:root:/root:/bin/bash
+		user1:x:500:500::/home/user1:/bin/bash
+		user2:x:501:501::/home/user2:/bin/bash
+		user3:x:502:502::/home/user3:/bin/bash
+	3、cat /etc/passwd | grep /bin/bash | grep -v root
+		user1:x:500:500::/home/user1:/bin/bash
+		user2:x:501:501::/home/user2:/bin/bash
+		user3:x:502:502::/home/user3:/bin/bash	
+	4、cat /etc/passwd | grep /bin/bash |grep -v root | cut -d ":" -f 1
+		user1
+		user2
+		user3
+		
+5-cut命令的局限
+	1、df -h
+		Filesystem      Size  	Used 		Avail 	Use%	Mounted on
+		/dev/sda5       6.8G  	2.0G 		 4.6G 	 30%	/
+		tmpfs           342M  	   0 		 342M 	  0%	/dev/shm
+		/dev/sda1       194M  	 28M 		 157M 	 15%	/boot
+		/dev/sda2       2.0G  	 36M 		 1.8G 	  2%	/home
+	2、df -h |grep "sda5"
+		/dev/sda5       6.8G  2.0G  4.6G  30% /
+	3、df -h |grep "sda5" | cut -f 5
+		/dev/sda5       6.8G  2.0G  4.6G  30% /
+		1.输出结果中的空白地方为空格，使用cut命令就不管用了
+	4、df -h |grep "sda5" | cut -d " " -f 5 
+		1.显示的结果为空行
+		2.cut -d " "中的分隔符指定为几个，其查找就为几个
+		
+		
+		
+		
+		
+

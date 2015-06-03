@@ -1,0 +1,140 @@
+10.4.2环境变量
+
+export env  unset pstree $PATH PS1
+
+1-环境变量
+	1、用户自定义变量只在当前的shell中生效，
+	2、而环境变量会在当前shell和这个shell的所有子shell当中生效，
+	3、如果把环境变量写入相应配置文件中，
+	4、那么这个环境变量就会在所有的shell中生效
+	5、可以把环境变量理解为全局变量，而本地变量理解为局部变量
+	
+2-设置环境变量
+	1、export 变量名=变量值
+
+3-查询变量
+	1、env
+
+4-删除变量
+	1、unset 变量名
+
+5-父子shell实例理解
+	1、csh
+	2、pstree
+		sshd───sshd───bash───csh───pstree
+		#呈级别，sshd是开始的父，依次子的子关系
+	3、sh
+	4、pstree
+		sshd───sshd───bash───csh───sh───pstree
+	5、exit
+		sshd───sshd───bash───csh───pstree
+	6、exit
+		sshd───sshd───bash───pstree
+		回到最开始bash状态
+
+6-实例，用户自定义环境变量
+	1、name=wangliang 	#本地变量
+	2、export age=28	#环境变量
+	3、sex=man			#本地变量
+	4、export sex		#将本地变量sex声明成环境变量
+	5、set				#查看所有的变量
+		age=28
+		name=wangliang
+		sex=man
+	6、bash				#再次进入到一个shell之中
+	7、pstree
+		sshd───sshd───bash───bash───pstree
+	8、set
+		age=28
+		sex=man
+		1.本地变量name，不在刚刚再次入的子shell之中，
+		2.本地变量name，只在声明的shell之中，不在其他或是子shell中
+	9、把环境变量age和sex，写入到配置文件中，
+		对操作系统中的所有shell都生效
+	
+7-实例，系统自带的环境变量
+	1、输入set
+	2、PATH=/usr/lib/qt-3.3/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+	3、PS1='[\u@\h \W]\$ '
+	
+8-PATH：系统查找命令的路径
+	1、echo $PATH 
+		/usr/lib/qt-3.3/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+		1.linux执行命令，要写命令加路径 的方式
+		2.在执行一些系统命令，只写命令，而不用写路径，
+		3.由于$PATH系统查找命令的路径
+		4.当执行如ls命令时，会从/usr/lib/qt-3.3/bin目录下找ls命令，
+		5./usr/lib/qt-3.3/bin目录下不存在ls命令，
+		6.再往后找/usr/local/sbin目录下是否存在ls命令，依次类推
+		7.如果在所有的$PATH系统查找命令的路径，查找不到命令
+		8.系统就会报错，命令不能识别
+		9.如果随便输入一个命令lsfsdf
+		10.先到$PATH系统查找命令的路径中查找，此命令是否存在，
+		11.查找不命令lsfsdf存在
+		12.报错，bash: lsfsdf: command not found
+	2、PATH="$PATH":/root/sh
+		#PATH变量叠加
+		
+9-实例，$PATH 
+	1、cd ~
+	2、vim hello.sh
+		#!/bin/bash
+		echo "hello world" 
+	3、chmod 755 hello.sh
+	4、./hello.sh 或/root/hello.sh 
+		#使用相对路径或绝对路径
+		hello world
+	5、把hello.sh脚本复制到$PATH系统查找命令的路径当中	
+		cp hello.sh /bin
+	6、输入hello.sh
+		hello world	
+		
+10-实例，PATH变量叠加	
+	1、不建议自己写的脚本复制到$PATH所定义路径中，
+		不方便区分系统命令，还是自定义命令
+	2、建议使用PATH变量叠加方式
+	3、PATH="$PATH":/root
+	4、输入hello.sh
+		hello world	
+	5、echo $PATH 
+		/usr/lib/qt-3.3/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:/root/
+	6、此种方式，临时生效，重启就是失效了
+	7、永久生效，写入对应的配置文件中
+		
+11-PS1：定义系统提示符的变更
+	[root@localhost ~]#
+	PS1='[\u@\h \W]\$ '
+	1、\d	显示日期，格式为"星期 月 日"	
+	2、\h	显示简写主机名。如默认主机名"localhost"
+	3、\t	显示24小时制时间，格式为"HH:MM:SS"
+	4、\T	显示12小时制时间，格式为"HH:MM:SS"
+	5、\A	显示24小时制时间，格式为"HH:MM:"
+	6、\u	显示当前用户名
+	7、\w	显示当前所在目录的完整名称
+	8、\W	显示当前所在目录的最后一个目录
+	9、\#	执行的第几个命令
+	10、\$	提示符
+		1.如果是超级管理员，会显示提示符为"#"
+		2.如果是普通用户，会显示提示符为"$"
+
+12-实例，PS1定义系统提示符的变更
+	1、PS1='[\u@\t \w]\$'
+		[root@07:45:49 ~]#
+	2、PS1='[\u@\@ \h \# \W]\$'
+		[root@07:46 上午 localhost 31 ~]#
+	3、
+
+
+
+
+
+
+
+
+
+	
+	
+	
+
+
+

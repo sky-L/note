@@ -1,0 +1,49 @@
+11.5.2case语句
+
+1-case语句
+	case $变量名 in
+		"值1")
+			如果变量等于1，则执行程序1
+			;;
+		"值2")
+			如果变量等于2，则执行程序2
+			;;
+		"值3")
+			如果变量等于3，则执行程序3
+			;;
+		……省略
+		*)
+			如果变量的值都不是以上的值，则执行此程序
+			;;
+	esac
+	
+2-case实例
+	1、cd ~ && mkdir sh && cd sh
+	2、vim case.sh
+		#!/bin/bash
+		echo "you want go to ShaiHai,please input 1!"
+		echo "you want go to GuangZhou,please input 2!"
+		echo "you want go to ChenDu,please input 3!"
+		read -t 30 -p "please input your chooise: " cho
+		case $cho in
+			"1")
+				echo "you have no money!"
+				;;
+			"2")
+				echo "you have no money,too!"
+				;;
+			"3")
+				echo "I have money,year!"
+				;;
+			*)
+				echo "I have only a title money!"
+				;;
+		esac
+	3、chmod 755 case.sh && ./case.sh
+	
+
+
+
+
+
+

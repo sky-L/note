@@ -1,0 +1,99 @@
+11.2.4字符截取命令-sed
+
+1-sed
+	1、是一种几乎包括在所有Unix平台(包括Linux)的轻量级流编辑器。
+	2、主要用来将数据进行选取、替换、删除、新增的命令。
+
+2-sed [选项]'[动作]' 文件名
+	1、选项
+		1.-n
+			1.一般sed命令会把所有数据输出到屏幕，
+			2.加入引选项，只会把经过sed命令处理的行输出到屏幕
+		2.-e
+			1.允许对输入数据应用多条sed命令编辑
+			2.多个条件之间可以用分号分开，也可以使用回车分开
+		3.-i
+			用sed的修改结果直接修改读取数据的谇，而不是由屏幕输出
+	2、动作
+		1.a\	追加，在当前行后添加一行或多行。
+			添加多行时，除最后一行外，每行末尾需要用"\"代表数据未完结。
+		2.c\	行替换，用c后面的字符替换原数据行。
+			添加多行时，除最后一行外，每行末尾需要用"\"代表数据未完结。
+		3.i\	插入，在当前行前插入一行或多行。
+			插入多行时，除最后一行外，每行末尾需要用"\"代表数据未完结。
+		4.d		删除，删除指定的行
+		5.p		打印，输出指定的行
+		6.s		字符串替换，用一个字符串替换另一个字符串。
+			1.格式为"行范围s/旧字符串/新字符串/g"
+			2.和vim中的替换格式类似
+			
+3-实例，sed
+	1、cat student.txt
+		Id      Name            Gender  Mark
+		1       Xiaoming        M       86
+		2       Lilei           M       90
+		3       Ruhua           w       83
+	2、sed '2p' student.txt 
+		Id      Name            Gender  Mark
+		1       Xiaoming        M       86
+		1       Xiaoming        M       86
+		2       Lilei           M       90
+		3       Ruhua           w       83
+	3、sed -n '2p' student.txt 
+		1       Xiaoming        M       86
+	4、df -h | sed -n "2p"
+		/dev/sda5       6.8G  2.0G  4.6G  30% /
+	5、sed '2,3d' student.txt     
+		Id      Name            Gender  Mark
+		3       Ruhua           w       83
+	6、cat student.txt 
+		Id      Name            Gender  Mark
+		1       Xiaoming        M       86
+		2       Lilei           M       90
+		3       Ruhua           w       83
+	7、sed '2a hello' student.txt 
+		Id      Name            Gender  Mark
+		1       Xiaoming        M       86
+		hello
+		2       Lilei           M       90
+		3       Ruhua           w       83
+	8、 sed '2i xiaoming' student.txt       
+		Id      Name            Gender  Mark
+		xiaoming
+		1       Xiaoming        M       86
+		2       Lilei           M       90
+		3       Ruhua           w       83
+	9、sed '2c xiaoming' student.txt  
+		Id      Name            Gender  Mark
+		xiaoming
+		2       Lilei           M       90
+		3       Ruhua           w       83	
+	10、sed '3s/90/100/g' student.txt  
+		Id      Name            Gender  Mark
+		1       Xiaoming        M       86
+		2       Lilei           M       100
+		3       Ruhua           w       83
+	11、cat student.txt 
+		Id      Name            Gender  Mark
+		1       Xiaoming        M       86
+		2       Lilei           M       90
+		3       Ruhua           w       83		
+	12、sed -i '3s/90/100/g' student.txt 
+	13、cat student.txt 
+		Id      Name            Gender  Mark
+		1       Xiaoming        M       86
+		2       Lilei           M       100
+		3       Ruhua           w       83
+				
+		
+		
+		
+		
+		
+		
+
+
+
+
+
+

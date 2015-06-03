@@ -1,0 +1,114 @@
+11.5.3for循环
+
+1-for循环
+	1、写法一
+		for 变量 in 值1 值2 值3 ……
+			do
+				程序
+			done
+		1.值的个数为几，for循环的次数就为几次
+		2.每循环一次，就会把值赋给变量一次
+		3.in后面的值，只要是空开的，空格换行都可以
+	2、写法二
+		for (( 初始值; 循环控件条件; 变量变化 ))
+			do
+				程序
+			done
+
+2-实例，for循环写法一
+	1、cd ~ && mkdir sh && cd sh
+	2、vim for.sh	
+		#!/bin/bash
+		for time in morning noon afternoon evening
+			do
+				echo "This time is $time !"
+			done
+	3、chmod 755 for.sh && ./for.sh
+		This time is morning !
+		This time is noon !
+		This time is afternoon !
+		This time is evening !
+
+2-批量解压缩，for循环写法一
+	1、写一个脚本
+		#!/bin/bash
+		cd /lamp
+		ls *.targz > ls.log
+		for i in $(cat ls.log)
+			do
+				tar -zxf $i &> /dev/null
+			done
+		rm -rf /lamp/ls.log
+	2、cat ls.log内容形式类似于这个样子
+		anaconda-ks.cfg
+		install.log
+		test1.targz
+		install.log.syslog
+		test2.targz
+		ls.log
+		sh
+	3、给这个脚本赋予权限并执行
+
+4-实例，for循环写法二
+	1、实例一
+		1.cd ~ && mkdir sh && cd sh
+		2.vim for2.sh
+			#!/bin/bash
+			for (( i=0; i<5; i=i+1 ))
+				do
+					echo "$i "
+				done
+		3.chmod 755 ./for2.sh
+		4.执行./for2.sh
+			0
+			1
+			2
+			3
+			4
+		5.chmod 755 ./for2.sh && ./for2.sh
+			这样写会报错，并不能进行循环
+
+5-打印1到100的和，for循环写法二
+	#!/bin/bash
+	s=0
+	for (( i=0; i<=100; i=i+1 ))
+		do
+			$=$(( $s+$i))
+		done
+	echo "Sum is: $s"
+
+6-批量添加用户
+	1、cd ~ && mkdir sh && cd sh
+	2、vim user.sh
+		#!/bin/bash
+		read -t 30 -p "Please input user name: "  name
+		read -t 30 -p "Please input user num: " num
+		read -t 30 -p "Please input user password: " pass
+		if [ ! -z "$name" -a ! -z "$num" -a ! -z "$pass" ]
+			then
+				y=$(echo $num | sed 's/^[0-9]*$'//g)
+				if [ -z "$y" ]
+					then
+						for (( i=1; i<$num; i=i+1 ))
+							do
+								useradd $name$i &> /dev/null
+								echo $pass | passwd --stdin "$name$i" &> /dev/null
+							done
+				fi
+		fi
+	3、chmod 755 user.sh
+	4、./user.sh
+	5、按照输出的提示信息，填写要批量添加的用户名、用户数量、用户密码
+	6、稍等一小下
+	7、cat /etc/passwd
+	8、cat /etc/shadow
+
+
+
+
+
+
+
+			
+
+
