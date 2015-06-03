@@ -81,6 +81,15 @@ var_dump($b);
 $tmp = sprintf("%u",crc32('abc'));
 
 
+
+
+
+/*---------------分割线-------------------*/
+
+
+
+
+
 class team{
     
     public $arr = array();
