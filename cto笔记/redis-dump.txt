@@ -4,7 +4,7 @@ redis合并多个 dump.rdb
 
 apt-get install ruby
 
-apt-get install ruby1.9.1-dev
+apt-get install ruby1.9.1-dev (yum instal ruby-devel)
 
 apt-get install rubygems
 
