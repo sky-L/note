@@ -1,13 +1,15 @@
-redisºÏ²¢¶à¸ö dump.rdb
+redisåˆå¹¶å¤šä¸ª dump.rdb
 
-ÏÂÔØredis-dumpÎÄµµµØÖ·£ºhttps://github.com/delano/redis-dump
+ä¸‹è½½redis-dumpæ–‡æ¡£åœ°å€ï¼šhttps://github.com/delano/redis-dump
 
 apt-get install ruby
 
-apt-get install ruby1.9.1-dev
+apt-get install ruby1.9.1-dev (yum instal ruby-devel)
+
+apt-get install rubygems
 
 gem install redis-dump
 
-ÏÂÔØ¹ı³ÌÖĞÌáÊ¾  Error installing redis-dump: ERROR: Failed to build gem native extension.
+ä¸‹è½½è¿‡ç¨‹ä¸­æç¤º  Error installing redis-dump: ERROR: Failed to build gem native extension.
 
-Ìí¼Ó ruby1.9.1-dev°ü¾Í¿ÉÒÔ½â¾öÕâ¸öÎÊÌâÁË£ºapt-get install ruby1.9.1-dev
+æ·»åŠ  ruby1.9.1-devåŒ…å°±å¯ä»¥è§£å†³è¿™ä¸ªé—®é¢˜äº†ï¼šapt-get install ruby1.9.1-dev
