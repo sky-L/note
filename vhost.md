@@ -1,4 +1,4 @@
-##nginx转发请求
+## nginx转发请求
 
 ```
 
@@ -14,7 +14,7 @@ server {
 }
 
 ```
-##apache转发请求
+## apache转发请求
 
 ```
 <VirtualHost *:80> 
@@ -27,11 +27,11 @@ server {
 ```
 
 
-##apache支持php
+## apache支持php
 
 `AddHandler application/x-httpd-php .php`
 
-##nginx支持php
+## nginx支持php
 
 ```
     location ~ ^(.+\.php)(.*)$
